@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+  movies:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/usr/src/app/movies/app
+    ports:
+      - "9999:9999"
+    restart: always
+    command: sh -c "npm install && npm run dev"
