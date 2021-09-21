@@ -1,10 +1,22 @@
 const Koa = require("koa");
 const Router = require("koa-router");
 const app = (module.exports = new Koa());
+const CronJob = require("cron").CronJob;
 const router = new Router();
 
 const getMovies = require("./getMovies");
 const getMovie = require("./getMovie");
+const cron = require("./cron");
+
+router.get("/cron", async function (ctx) {
+  const { page = 1 } = ctx.request.query;
+  ctx.body = await cron.startCron(page);
+});
+
+router.get("/cron/movies", async function (ctx) {
+  const { page = 1, type, year } = ctx.request.query;
+  ctx.body = await cron.getMovies({ page, type, year });
+});
 
 router.get("/movies", async function (ctx) {
   let movies = [];
@@ -30,6 +42,26 @@ router.get("/movie", async (ctx) => {
   }
   ctx.body = movie;
 });
+
+const cron1 = new CronJob("0 0 0 * * *", () => {
+  cron.startCron(1);
+});
+cron1.start();
+
+const cron2 = new CronJob("0 0 6 * * *", () => {
+  cron.startCron(2);
+});
+cron2.start();
+
+const cron3 = new CronJob("0 0 12 * * *", () => {
+  cron.startCron(3);
+});
+cron3.start();
+
+const cron4 = new CronJob("0 0 18 * * *", () => {
+  cron.startCron(4);
+});
+cron4.start();
 
 app.use(router.routes()).use(router.allowedMethods());
 

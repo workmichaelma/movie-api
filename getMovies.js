@@ -35,8 +35,15 @@ exports.handler = async (event) => {
     },
   };
 
+  const parseName = (name) => {
+    if (name.indexOf("/") > -1) {
+      return name.split("/")[0];
+    }
+    return name;
+  };
+
   const movies = await axios
-    .get(getUrl(page, region, orderBy), headers)
+    .get(getUrl(page, region, orderBy), headers, { timeout: 60000 })
     .then(({ data }) => {
       try {
         const $ = cheerio.load(data);
@@ -53,8 +60,9 @@ exports.handler = async (event) => {
               source: (source || "")
                 .replace(/^(https:\/\/www.movieffm.net\/movies\/)/g, "")
                 .replace("/", ""),
-              title: item.find("h3 > a").text(),
-              date: item.find(".data > span").text().slice(-4),
+              title: parseName(item.find("h3 > a").text()),
+              date: item.find(".data > span").text(),
+              year: item.find(".data > span").text().slice(0, 4),
               tags: item
                 .find(".dtinfo > .genres > .mta a")
                 .map((a, tag) => {
