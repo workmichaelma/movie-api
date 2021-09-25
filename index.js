@@ -18,6 +18,10 @@ router.get("/cron/movies", async function (ctx) {
   ctx.body = await cron.getMovies({ page, type, year });
 });
 
+router.get("/cron/movies/all", async function (ctx) {
+  ctx.body = await cron.getAllMovies();
+});
+
 router.get("/movies", async function (ctx) {
   let movies = [];
   const { region, page, orderBy } = ctx.request.query || {};

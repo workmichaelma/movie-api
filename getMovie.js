@@ -30,9 +30,12 @@ exports.handler = async (event) => {
         .get(getSource(source), headers)
         .then(({ data }) => {
           const $ = cheerio.load(data);
-          const sources = $(".source-box").not("#source-player-trailer");
+          const sourcesDoc = $(".source-box").not("#source-player-trailer");
+          const trailerDoc = $("#source-player-trailer iframe");
+          const trailer =
+            trailer.length > -1 ? trailerDoc.attr("src") || "" : "";
 
-          return sources
+          const sources = sourcesDoc
             .map((i, el) => {
               const source = $(el);
               const url = source.find("iframe").attr("src");
@@ -52,17 +55,29 @@ exports.handler = async (event) => {
               return "";
             })
             .get();
+          return {
+            sources: sources.filter((s) => s),
+            trailer,
+          };
         })
         .catch((err) => {
-          return [];
+          return {
+            sources: [],
+            trailer: "",
+            err,
+          };
         });
     } catch (err) {
-      return [];
+      return {
+        sources: [],
+        trailer: "",
+        err,
+      };
     }
   }
   const response = {
     statusCode: 200,
-    body: JSON.stringify([...new Set(movie.filter((e) => e))]),
+    body: JSON.stringify(movie),
   };
   return response;
 };

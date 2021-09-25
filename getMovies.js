@@ -1,6 +1,7 @@
 exports.handler = async (event) => {
   const cheerio = require("cheerio");
   const axios = require("axios");
+  const moment = require("moment");
   const { page, region, orderBy } = event.queryStringParameters || {};
   const getUrl = (page = 1, region = "", orderBy = "view") => {
     return `https://www.movieffm.net/movies/page/${page}/?genres&orderby=${orderBy}&region=${encodeURIComponent(
@@ -35,6 +36,14 @@ exports.handler = async (event) => {
     },
   };
 
+  const parseDate = (date) => {
+    try {
+      return moment(date).unix() * 1000;
+    } catch {
+      return date;
+    }
+  };
+
   const parseName = (name) => {
     if (name.indexOf("/") > -1) {
       return name.split("/")[0];
@@ -61,7 +70,7 @@ exports.handler = async (event) => {
                 .replace(/^(https:\/\/www.movieffm.net\/movies\/)/g, "")
                 .replace("/", ""),
               title: parseName(item.find("h3 > a").text()),
-              date: item.find(".data > span").text(),
+              date: parseDate(item.find(".data > span").text()),
               year: item.find(".data > span").text().slice(0, 4),
               tags: item
                 .find(".dtinfo > .genres > .mta a")

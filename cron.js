@@ -76,23 +76,31 @@ const _ = {
       docRef = docRef.where("tags", "array-contains", type);
     }
 
-    const snapshot = await docRef.get();
+    const snapshot = await docRef
+      .orderBy("date", "desc")
+      .offset((page - 1) * 50)
+      .limit(50)
+      .get();
     const items = [];
-    let i = 0;
     snapshot.forEach((doc) => {
-      i++;
-      if (i >= (_page - 1) * 50 + 1 && i <= _page * 50) {
-        items.push(doc.data());
-      }
+      items.push(doc.data());
     });
 
     return {
-      totalItems: i,
-      totalPage: Math.ceil(i / 50),
       currentPage: _page,
-      hasNextPage: i > _page * 50,
+      hasNextPage: items.length >= 50,
       items,
     };
+  },
+  getAllMovies: async () => {
+    _.initDB();
+    const snapshot = await _.db.collection(_.DB_NAME).get();
+    const items = [];
+    let i = 0;
+    snapshot.forEach((doc) => {
+      items.push(doc.data());
+    });
+    return items;
   },
 };
 
