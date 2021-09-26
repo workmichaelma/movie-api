@@ -64,6 +64,12 @@ exports.handler = async (event) => {
 
             const source = item.find(".poster > a").attr("href");
 
+            const tags = item
+              .find(".dtinfo > .genres > .mta a")
+              .map((a, tag) => {
+                return $(tag).text();
+              })
+              .get();
             return {
               poster: item.find(".poster > img").attr("src"),
               source: (source || "")
@@ -72,12 +78,8 @@ exports.handler = async (event) => {
               title: parseName(item.find("h3 > a").text()),
               date: parseDate(item.find(".data > span").text()),
               year: item.find(".data > span").text().slice(0, 4),
-              tags: item
-                .find(".dtinfo > .genres > .mta a")
-                .map((a, tag) => {
-                  return $(tag).text();
-                })
-                .get(),
+              tags,
+              hot: tags.indexOf("熱門電影") > -1 ? 1 : 0,
             };
           })
           .get();

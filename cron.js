@@ -2,8 +2,9 @@ const CronJob = require("cron").CronJob;
 const axios = require("axios");
 var convert = require("xml-js");
 const getMovies = require("./getMovies");
-const { map, range, flatten, slice } = require("lodash");
+const { map, range, flatten, slice, orderBy } = require("lodash");
 const admin = require("firebase-admin");
+const moment = require("moment");
 
 const serviceAccount = require("./movies-9c04d-firebase-adminsdk-er3do-cb0243730b");
 
@@ -64,6 +65,18 @@ const _ = {
       return {};
     }
   },
+  moviesPreprocess: (snapshot) => {
+    const items = [];
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      items.push({
+        ...data,
+        date: moment(data.date).format("YYYY-MM-DD"),
+      });
+    });
+
+    return items;
+  },
   getMovies: async ({ page = 1, type, year }) => {
     _.initDB();
     const _page = parseInt(page);
@@ -79,27 +92,20 @@ const _ = {
     const snapshot = await docRef
       .orderBy("date", "desc")
       .offset((page - 1) * 50)
-      .limit(50)
+      .limit(51)
       .get();
-    const items = [];
-    snapshot.forEach((doc) => {
-      items.push(doc.data());
-    });
+    const items = _.moviesPreprocess(snapshot);
 
     return {
       currentPage: _page,
-      hasNextPage: items.length >= 50,
-      items,
+      hasNextPage: items.length > 50,
+      items: slice(items, 0, 50),
     };
   },
   getAllMovies: async () => {
     _.initDB();
     const snapshot = await _.db.collection(_.DB_NAME).get();
-    const items = [];
-    let i = 0;
-    snapshot.forEach((doc) => {
-      items.push(doc.data());
-    });
+    const items = _.moviesPreprocess(snapshot);
     return items;
   },
 };
