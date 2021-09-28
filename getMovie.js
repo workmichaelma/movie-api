@@ -7,6 +7,16 @@ exports.handler = async (event) => {
     return `https://www.movieffm.net/movies/${source}`;
   };
 
+  const getTrailerId = (url) => {
+    try {
+      return url
+        .replace("https://www.youtube.com/embed/", "")
+        .replace("?autoplay=0&autohide=1", "");
+    } catch {
+      return "";
+    }
+  };
+
   const isURL = (url) => {
     try {
       if (new URL(url)) {
@@ -32,8 +42,9 @@ exports.handler = async (event) => {
           const $ = cheerio.load(data);
           const sourcesDoc = $(".source-box").not("#source-player-trailer");
           const trailerDoc = $("#source-player-trailer iframe");
-          const trailer =
-            trailer.length > -1 ? trailerDoc.attr("src") || "" : "";
+          const trailer = getTrailerId(
+            trailerDoc.length > -1 ? trailerDoc.attr("src") || "" : ""
+          );
 
           const sources = sourcesDoc
             .map((i, el) => {
