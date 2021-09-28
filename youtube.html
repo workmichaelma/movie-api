@@ -1,0 +1,69 @@
+<script
+  src="https://code.jquery.com/jquery-3.6.0.slim.min.js"
+  integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
+  crossorigin="anonymous"
+></script>
+
+<div id="YouTubeVideoPlayerAPI"></div>
+
+<style>
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+  }
+  #YouTubeVideoPlayerAPI {
+    width: 100vw;
+    height: 100vh;
+  }
+</style>
+
+<script>
+  var player;
+  function loadScript() {
+    if (typeof YT == "undefined" || typeof YT.Player == "undefined") {
+      var tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      var firstScriptTag = document.getElementsByTagName("script")[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    }
+  }
+
+  function loadPlayer() {
+    window.onYouTubePlayerAPIReady = function () {
+      onYouTubePlayer();
+    };
+  }
+
+  $(function () {
+    loadScript();
+  });
+  function onYouTubeIframeAPIReady() {
+    var url = new URL(document.location.href);
+    const videoId = url.searchParams.get("videoId");
+    player = new YT.Player("YouTubeVideoPlayerAPI", {
+      videoId, // YouTube 影片ID
+      playerVars: {
+        autoplay: 1, // 自動播放影片
+        controls: 0, // 顯示播放器
+        showinfo: 0, // 隱藏影片標題
+        modestbranding: 0, // 隱藏YouTube Logo
+        loop: 1, // 重覆播放
+        // playlist: "rshfNb2ped8", // 當使用影片要重覆播放時，需再輸入YouTube 影片ID
+        fs: 0, // 隱藏全螢幕按鈕
+        cc_load_policty: 0, // 隱藏字幕
+        iv_load_policy: 3, // 隱藏影片註解
+        autohide: 0, // 影片播放時，隱藏影片控制列
+        enablejsapi: 1,
+        disablekb: 1,
+        rel: 0,
+      },
+      events: {
+        onReady: function (e) {
+          e.target.mute();
+          e.target.playVideo();
+        },
+      },
+    });
+  }
+</script>

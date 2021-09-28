@@ -1,5 +1,6 @@
 const Koa = require("koa");
 const Router = require("koa-router");
+const send = require("koa-send");
 const app = (module.exports = new Koa());
 const CronJob = require("cron").CronJob;
 const router = new Router();
@@ -45,6 +46,10 @@ router.get("/movie", async (ctx) => {
     movie = JSON.parse(body);
   }
   ctx.body = movie;
+});
+
+router.get("/youtube", async (ctx) => {
+  await send(ctx, "./youtube.html");
 });
 
 const cron1 = new CronJob("0 0 0 * * *", () => {
