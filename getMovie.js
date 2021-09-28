@@ -13,7 +13,7 @@ exports.handler = async (event) => {
         .replace("https://www.youtube.com/embed/", "")
         .replace("?autoplay=0&autohide=1", "");
     } catch {
-      return "";
+      return null;
     }
   };
 
