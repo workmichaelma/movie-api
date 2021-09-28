@@ -8,13 +8,16 @@ exports.handler = async (event) => {
   };
 
   const getTrailerId = (url) => {
-    try {
-      return url
-        .replace("https://www.youtube.com/embed/", "")
-        .replace("?autoplay=0&autohide=1", "");
-    } catch {
-      return null;
+    if (url) {
+      try {
+        return url
+          .replace("https://www.youtube.com/embed/", "")
+          .replace("?autoplay=0&autohide=1", "");
+      } catch {
+        return null;
+      }
     }
+    return null;
   };
 
   const isURL = (url) => {
