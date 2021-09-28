@@ -10,9 +10,10 @@ exports.handler = async (event) => {
   const getTrailerId = (url) => {
     if (url) {
       try {
-        return url
+        const id = url
           .replace("https://www.youtube.com/embed/", "")
           .replace("?autoplay=0&autohide=1", "");
+        return id || null;
       } catch {
         return null;
       }
