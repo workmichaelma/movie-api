@@ -23,6 +23,15 @@ router.get("/cron/movies/all", async function (ctx) {
   ctx.body = await cron.getAllMovies();
 });
 
+router.get("/movie", async function (ctx) {
+  const { source } = ctx.request.query;
+  if (source) {
+    ctx.body = await cron.getMovie(source);
+  } else {
+    ctx.body = {};
+  }
+});
+
 router.get("/movies", async function (ctx) {
   let movies = [];
   const { region, page, orderBy } = ctx.request.query || {};
@@ -36,17 +45,17 @@ router.get("/movies", async function (ctx) {
   ctx.body = movies;
 });
 
-router.get("/movie", async (ctx) => {
-  let movie = [];
-  const { source } = ctx.request.query || {};
-  const { body } = await getMovie.handler({
-    queryStringParameters: { source },
-  });
-  if (body) {
-    movie = JSON.parse(body);
-  }
-  ctx.body = movie;
-});
+// router.get("/movie", async (ctx) => {
+//   let movie = [];
+//   const { source } = ctx.request.query || {};
+//   const { body } = await getMovie.handler({
+//     queryStringParameters: { source },
+//   });
+//   if (body) {
+//     movie = JSON.parse(body);
+//   }
+//   ctx.body = movie;
+// });
 
 router.get("/youtube", async (ctx) => {
   await send(ctx, "./youtube.html");

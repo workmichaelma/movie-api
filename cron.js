@@ -2,6 +2,7 @@ const CronJob = require("cron").CronJob;
 const axios = require("axios");
 var convert = require("xml-js");
 const getMovies = require("./getMovies");
+const getMovie = require("./getMovie");
 const { map, range, flatten, slice, orderBy } = require("lodash");
 const admin = require("firebase-admin");
 const moment = require("moment");
@@ -16,6 +17,17 @@ const fetchMovies = async (page) => {
     return JSON.parse(body);
   } catch (err) {
     console.log(`Fetch movies error, Page:${page}`);
+  }
+};
+
+const fetchMovie = async (source) => {
+  try {
+    const { body } = await getMovie.handler({
+      queryStringParameters: { source },
+    });
+    return JSON.parse(body);
+  } catch (err) {
+    console.log(`Fetch movie error, Source:${source}`);
   }
 };
 
@@ -108,6 +120,31 @@ const _ = {
     const snapshot = await _.db.collection(_.DB_NAME).get();
     const items = _.moviesPreprocess(snapshot);
     return items;
+  },
+  getMovie: async (source) => {
+    _.initDB();
+    const snapshot = await _.db
+      .collection(_.DB_NAME)
+      .where("source", "==", source)
+      .get();
+    const [item] = _.moviesPreprocess(snapshot);
+    const { sources, trailer } = item;
+    if (sources && trailer !== undefined) {
+      return item;
+    } else {
+      const detail = await fetchMovie(source);
+      const { sources, trailer } = detail || {};
+      if (sources && trailer !== undefined) {
+        const movie = {
+          ...item,
+          ...detail,
+        };
+        _.insertToDB(movie);
+        return movie;
+      } else {
+        return item;
+      }
+    }
   },
 };
 
