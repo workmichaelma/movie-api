@@ -82,6 +82,7 @@ const _ = {
     const _page = parseInt(page);
     let docRef = _.db.collection(_.DB_NAME);
 
+    docRef = docRef.where("date", "<", moment().unix() * 1000);
     if (year) {
       docRef = docRef.where("year", "==", year);
     }
