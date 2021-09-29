@@ -31,6 +31,14 @@ const fetchMovie = async (source) => {
   }
 };
 
+const parseDate = (date) => {
+  try {
+    return moment(date).unix() * 1000;
+  } catch {
+    return date;
+  }
+};
+
 const _ = {
   db: null,
   DB_NAME: "movie",
@@ -67,7 +75,7 @@ const _ = {
   insertToDB: async (movie) => {
     try {
       const docRef = _.db.collection(_.DB_NAME).doc(movie.title);
-      const doc = await docRef.set(movie);
+      const doc = await docRef.set(movie, { merge: true });
       return {
         doc,
         movie: movie.title,
@@ -128,22 +136,27 @@ const _ = {
       .where("source", "==", source)
       .get();
     const [item] = _.moviesPreprocess(snapshot);
-    const { sources, trailer } = item;
-    if (sources && trailer !== undefined) {
-      return item;
-    } else {
-      const detail = await fetchMovie(source);
-      const { sources, trailer } = detail || {};
+    if (item) {
+      const { sources, trailer } = item || {};
       if (sources && trailer !== undefined) {
-        const movie = {
-          ...item,
-          ...detail,
-        };
-        _.insertToDB(movie);
-        return movie;
-      } else {
         return item;
+      } else {
+        const detail = await fetchMovie(source);
+        const { sources, trailer } = detail || {};
+        if (sources && trailer !== undefined) {
+          const movie = {
+            ...item,
+            ...detail,
+            date: parseDate(item.date),
+          };
+          _.insertToDB(movie);
+          return movie;
+        } else {
+          return item;
+        }
       }
+    } else {
+      return {};
     }
   },
 };
