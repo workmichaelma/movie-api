@@ -84,6 +84,7 @@ exports.handler = async (event) => {
           })
           .get();
       } catch (err) {
+        console.log({ err });
         return [];
       }
     })
@@ -98,7 +99,8 @@ exports.handler = async (event) => {
           movie.tags.indexOf("驚悚片") < 0 &&
           movie.tags.indexOf("恐怖片") < 0 &&
           movie.tags.indexOf("情色片") < 0 &&
-          movie.tags.indexOf("寫真集") < 0
+          movie.tags.indexOf("寫真集") < 0 &&
+          movie.tags.indexOf("寫真片") < 0
         );
       })
     ),

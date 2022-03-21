@@ -112,15 +112,15 @@ const _ = {
 
     const snapshot = await docRef
       .orderBy("date", "desc")
-      .offset((page - 1) * 50)
-      .limit(51)
+      .offset((page - 1) * 30)
+      .limit(31)
       .get();
     const items = _.moviesPreprocess(snapshot);
 
     return {
       currentPage: _page,
-      hasNextPage: items.length > 50,
-      items: slice(items, 0, 50),
+      hasNextPage: items.length > 30,
+      items: slice(items, 0, 30),
     };
   },
   getAllMovies: async () => {
