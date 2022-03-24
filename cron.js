@@ -65,7 +65,11 @@ const _ = {
     if (movies.length > 0) {
       _.initDB();
       if (_.db) {
-        const push = map(movies, _.insertToDB);
+        const push = map(movies, (m) => {
+          setTimeout(() => {
+            _.insertToDB(m);
+          }, 500);
+        });
         const data = await Promise.all(push);
         return data;
       }
