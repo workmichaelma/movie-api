@@ -6,6 +6,7 @@ const getMovie = require("./getMovie");
 const { map, range, flatten, slice, orderBy } = require("lodash");
 const admin = require("firebase-admin");
 const moment = require("moment");
+const series = require("async/series");
 
 const serviceAccount = require("./movies-9c04d-firebase-adminsdk-er3do-cb0243730b");
 
@@ -66,12 +67,12 @@ const _ = {
       _.initDB();
       if (_.db) {
         const push = map(movies, (m) => {
-          setTimeout(() => {
-            _.insertToDB(m);
-          }, 500);
+          if (!m.error) {
+            return _.insertToDB(m);
+          }
+          return {};
         });
-        const data = await Promise.all(push);
-        return data;
+        return series(Promise.all(push));
       }
     }
     return [];
@@ -153,7 +154,9 @@ const _ = {
             ...detail,
             date: parseDate(item.date),
           };
-          _.insertToDB(movie);
+          if (!movie.err) {
+            _.insertToDB(movie);
+          }
           return movie;
         } else {
           return item;

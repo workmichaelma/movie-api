@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/workmichaelma/movie-api#readme",
   "dependencies": {
+    "async": "^3.2.3",
     "axios": "^0.21.1",
     "cheerio": "^1.0.0-rc.5",
     "cron": "^1.8.2",
